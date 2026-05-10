@@ -1,0 +1,224 @@
+version: '3.8'
+
+services:
+  # MySQL Database (Shared for pilot, prepared for decentralized migration)
+  mysql:
+    image: mysql:8.0
+    container_name: village_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: village_root_password
+      MYSQL_DATABASE: village
+      MYSQL_USER: village_user
+      MYSQL_PASSWORD: village_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - village_network
+
+  # Laravel Reverb Server (Real-time P2P signaling)
+  reverb:
+    build:
+      context: ./docker/reverb
+      dockerfile: Dockerfile
+    container_name: village_reverb
+    restart: unless-stopped
+    environment:
+      REVERB_APP_ID: ${REVERB_APP_ID:-village_app_id}
+      REVERB_APP_KEY: ${REVERB_APP_KEY:-village_app_key}
+      REVERB_APP_SECRET: ${REVERB_APP_SECRET:-village_app_secret}
+      REVERB_HOST: "0.0.0.0"
+      REVERB_PORT: 8080
+      REVERB_SSL_CERT_PATH: ""
+      REVERB_SSL_KEY_PATH: ""
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - village_network
+
+  # Laravel Node 1: village_alpha
+  village_alpha:
+    build:
+      context: ./village_engine
+      dockerfile: Dockerfile
+    container_name: village_alpha
+    restart: unless-stopped
+    environment:
+      APP_NAME: "Village Alpha"
+      APP_ENV: local
+      APP_KEY: base64:alpha_village_encryption_key_32_chars
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8001
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: village
+      DB_USERNAME: village_user
+      DB_PASSWORD: village_password
+      REVERB_APP_ID: ${REVERB_APP_ID:-village_app_id}
+      REVERB_APP_KEY: ${REVERB_APP_KEY:-village_app_key}
+      REVERB_APP_SECRET: ${REVERB_APP_SECRET:-village_app_secret}
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PASSWORD: null
+      REDIS_PORT: 6379
+      VILLAGE_ID: alpha
+      VILLAGE_NAME: "Village Alpha"
+      VILLAGE_SLUG: "village-alpha"
+      VILLAGE_THEME: "forest"
+      VILLAGE_ROLE: "primary"
+    ports:
+      - "8001:8000"
+    depends_on:
+      - mysql
+      - reverb
+      - redis
+    volumes:
+      - ./village_engine:/var/www/html
+      - ./docker/alpha/storage:/var/www/html/storage
+    networks:
+      - village_network
+
+  # Laravel Node 2: village_beta
+  village_beta:
+    build:
+      context: ./village_engine
+      dockerfile: Dockerfile
+    container_name: village_beta
+    restart: unless-stopped
+    environment:
+      APP_NAME: "Village Beta"
+      APP_ENV: local
+      APP_KEY: base64:beta_village_encryption_key_32_chars
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8002
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: village
+      DB_USERNAME: village_user
+      DB_PASSWORD: village_password
+      REVERB_APP_ID: ${REVERB_APP_ID:-village_app_id}
+      REVERB_APP_KEY: ${REVERB_APP_KEY:-village_app_key}
+      REVERB_APP_SECRET: ${REVERB_APP_SECRET:-village_app_secret}
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PASSWORD: null
+      REDIS_PORT: 6379
+      VILLAGE_ID: beta
+      VILLAGE_NAME: "Village Beta"
+      VILLAGE_SLUG: "village-beta"
+      VILLAGE_THEME: "ocean"
+      VILLAGE_ROLE: "secondary"
+    ports:
+      - "8002:8000"
+    depends_on:
+      - mysql
+      - reverb
+      - redis
+    volumes:
+      - ./village_engine:/var/www/html
+      - ./docker/beta/storage:/var/www/html/storage
+    networks:
+      - village_network
+
+  # Laravel Node 3: village_gamma
+  village_gamma:
+    build:
+      context: ./village_engine
+      dockerfile: Dockerfile
+    container_name: village_gamma
+    restart: unless-stopped
+    environment:
+      APP_NAME: "Village Gamma"
+      APP_ENV: local
+      APP_KEY: base64:gamma_village_encryption_key_32_chars
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8003
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: village
+      DB_USERNAME: village_user
+      DB_PASSWORD: village_password
+      REVERB_APP_ID: ${REVERB_APP_ID:-village_app_id}
+      REVERB_APP_KEY: ${REVERB_APP_KEY:-village_app_key}
+      REVERB_APP_SECRET: ${REVERB_APP_SECRET:-village_app_secret}
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PASSWORD: null
+      REDIS_PORT: 6379
+      VILLAGE_ID: gamma
+      VILLAGE_NAME: "Village Gamma"
+      VILLAGE_SLUG: "village-gamma"
+      VILLAGE_THEME: "mountain"
+      VILLAGE_ROLE: "secondary"
+    ports:
+      - "8003:8000"
+    depends_on:
+      - mysql
+      - reverb
+      - redis
+    volumes:
+      - ./village_engine:/var/www/html
+      - ./docker/gamma/storage:/var/www/html/storage
+    networks:
+      - village_network
+
+  # Database driver for Reverb (instead of Redis)
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: village_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - village_network
+
+  # Nginx Load Balancer (Optional for production)
+  nginx:
+    image: nginx:alpine
+    container_name: village_nginx
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - village_alpha
+      - village_beta
+      - village_gamma
+    networks:
+      - village_network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  village_network:
+    driver: bridge

@@ -1,0 +1,122 @@
+# Laravel
+.village_engine/.env
+.village_engine/.env.backup
+.village_engine/.phpunit.result.cache
+.village_engine/.phpunit.cache
+.village_engine/Homestead.json
+.village_engine/Homestead.yaml
+.village_engine/npm-debug.log
+.village_engine/yarn-error.log
+.village_engine/yarn-integrity
+.village_engine/node_modules/
+.village_engine/public/hot
+.village_engine/public/storage
+.village_engine/storage/*.key
+.village_engine/vendor/
+.village_engine/homestead
+
+# Dart / Flutter
+.village_ui/.dart_tool/
+.village_ui/.flutter-plugins-dependencies
+.village_ui/.flutter-tools/
+.village_ui/.packages/
+.village_ui/.pub-cache/
+.village_ui/build/
+.village_ui/.flutter-plugins
+.village_ui/.flutter_build_log
+.village_ui/.flutter_version
+.village_ui/.packages
+.village_ui/pubspec.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Database
+*.sqlite
+*.sqlite3
+.village_engine/database/database.sqlite
+.village_engine/database/database.sqlite-journal
+
+# Cache
+.village_engine/bootstrap/cache/
+.village_engine/storage/framework/cache/
+.village_engine/storage/framework/sessions/
+.village_engine/storage/framework/views/
+.village_engine/storage/logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Build artifacts
+.village_ui/build/web/
+.village_ui/build/wasm/
+.village_ui/build/flutter_assets/
+.village_ui/web/assets/
+
+# Test coverage
+.village_ui/coverage/
+.village_engine/storage/laravel.log
+.village_engine/phpunit.xml
+.village_engine/.phpunit.cache
+
+# Composer
+.village_engine/vendor/bin/
+.village_engine/composer.phar
+
+# Package managers
+.village_engine/package-lock.json
+.village_engine/yarn.lock
+.village_ui/pubspec.lock
+
+# Environment specific
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# Documentation build
+docs/build/
+docs/_build/
+
+# SR&ED documentation
+srned/
+research/
+experiments/
+
+# Keys and certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+ssl/
+certs/

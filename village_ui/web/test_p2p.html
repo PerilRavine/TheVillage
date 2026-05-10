@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Village - P2P Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.0/dist/echo.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .log { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>The Village - P2P Discovery Test</h1>
+        
+        <div id="connection-status" class="status">
+            Connecting to WebSocket...
+        </div>
+        
+        <div>
+            <button onclick="requestPeerDiscovery()">Request Peer Discovery</button>
+            <button onclick="getAvailablePeers()">Get Available Peers</button>
+            <button onclick="testAuthentication()">Test Authentication</button>
+        </div>
+        
+        <div id="log" class="log">
+            <strong>Event Log:</strong><br>
+        </div>
+    </div>
+
+    <script>
+        // Configure Laravel Echo
+        window.Echo = new Echo({
+            broadcaster: 'reverb',
+            key: 'village_app',
+            wsHost: window.location.hostname,
+            wsPort: 8080,
+            forceTLS: false,
+            enabledTransports: ['ws', 'wss'],
+            authEndpoint: '/api/user',
+            auth: {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                }
+            }
+        });
+
+        // Log function
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#721c24' : type === 'success' ? '#155724' : '#000';
+            logDiv.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span><br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        // Update connection status
+        window.Echo.connector.pusher.connection.bind('connected', () => {
+            document.getElementById('connection-status').className = 'status success';
+            document.getElementById('connection-status').textContent = 'Connected to WebSocket';
+            log('WebSocket connected successfully', 'success');
+        });
+
+        window.Echo.connector.pusher.connection.bind('error', (error) => {
+            document.getElementById('connection-status').className = 'status error';
+            document.getElementById('connection-status').textContent = 'WebSocket connection failed';
+            log(`WebSocket error: ${error}`, 'error');
+        });
+
+        // Listen for peer discovery requests
+        window.Echo.join('peer-discovery')
+            .listen('.peer.discovery.requested', (event) => {
+                log(`Peer discovery request from user ${event.user_id}`, 'info');
+                log(`Location: ${event.location}`, 'info');
+                log(`Preferences: ${JSON.stringify(event.preferences)}`, 'info');
+            });
+
+        // Listen for peer discovery responses
+        window.Echo.private('peer-discovery.123')
+            .listen('.peer.discovery.response', (event) => {
+                log(`Peer discovery response from ${event.responder_id}`, 'success');
+                log(`Responder reputation: ${event.reputation}`, 'info');
+                log(`Responder profile: ${JSON.stringify(event.profile)}`, 'info');
+            });
+
+        // API Functions
+        async function requestPeerDiscovery() {
+            try {
+                const response = await axios.post('/api/p2p/discovery/request', {
+                    location: 'Test Location',
+                    preferences: {
+                        max_distance: 100,
+                        min_reputation: 10
+                    }
+                });
+                log('Peer discovery request sent', 'success');
+                log(`Response: ${JSON.stringify(response.data)}`, 'info');
+            } catch (error) {
+                log(`Error requesting peer discovery: ${error.response?.data?.error || error.message}`, 'error');
+            }
+        }
+
+        async function getAvailablePeers() {
+            try {
+                const response = await axios.get('/api/p2p/peers');
+                log(`Found ${response.data.total} available peers`, 'success');
+                response.data.peers.forEach(peer => {
+                    log(`Peer: ${peer.username} (${peer.reputation} reputation)`, 'info');
+                });
+            } catch (error) {
+                log(`Error getting peers: ${error.response?.data?.error || error.message}`, 'error');
+            }
+        }
+
+        async function testAuthentication() {
+            try {
+                const response = await axios.get('/api/user');
+                log('Authentication test successful', 'success');
+                log(`User: ${JSON.stringify(response.data)}`, 'info');
+            } catch (error) {
+                log(`Authentication failed: ${error.response?.data?.error || error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

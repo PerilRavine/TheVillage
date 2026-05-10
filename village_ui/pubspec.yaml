@@ -1,0 +1,89 @@
+name: village_ui
+description: The Village - 3D P2P Trust Network UI
+version: 1.0.0
+
+environment:
+  sdk: '>=3.11.0 <4.0.0'
+
+# Dependencies specify other packages that your package needs in order to work.
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+
+  # Core dependencies for 3D rendering and P2P
+  # Native Dart 3D packages for WasmGC performance
+  vector_math: ^2.1.4
+  scene_graph: ^0.2.0
+  webgpu: ^0.0.1
+  skwasm: ^0.1.0
+  dart:js_interop: ^1.0.0
+  
+  # State management
+  flutter_bloc: ^8.1.3
+  equatable: ^2.0.5
+  
+  # Network and P2P
+  http: ^1.1.0
+  web_socket_channel: ^2.4.0
+  webrtc_interface: ^1.0.0
+  
+  # Cryptography and security
+  cryptography: ^2.0.5
+  pointycastle: ^3.7.3
+  
+  # Local storage and caching
+  shared_preferences: ^2.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
+  # Utilities
+  uuid: ^4.2.1
+  intl: ^0.18.1
+  logger: ^2.0.2+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  # Build tools for WebAssembly
+  build_runner: ^2.4.7
+  build_web_compilers: ^4.0.4
+  wasm_builder: ^1.0.0
+  
+  # Code generation
+  json_annotation: ^4.8.1
+  json_serializable: ^6.7.1
+  
+  # Testing
+  mockito: ^5.4.2
+  integration_test:
+    sdk: flutter
+
+# Flutter configuration
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/models/
+    - assets/textures/
+    - assets/shaders/
+    - assets/sounds/
+  
+  # WebAssembly build configuration
+  web:
+    wasm: true
+    renderer: skwasm
+    source_map: true
+
+# Build configuration
+targets:
+  web:
+    # WebAssembly build target
+    wasm: true
+    # Optimize for performance
+    source_map: false
+    # Enable tree shaking
+    tree_shake_icons: true
+    # Minify for production
+    release_profile: true
