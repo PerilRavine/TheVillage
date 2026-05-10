@@ -18,7 +18,6 @@ dependencies:
   scene_graph: ^0.2.0
   webgpu: ^0.0.1
   skwasm: ^0.1.0
-  dart:js_interop: ^1.0.0
   
   # State management
   flutter_bloc: ^8.1.3

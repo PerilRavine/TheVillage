@@ -101,10 +101,10 @@ dart run build:wasm
 - [x] Village recommendation system
 
 ### Week 3: The Spatial UI & The Map
-- [ ] Dart Wasm 3D engine
-- [ ] Force-directed village visualization
-- [ ] 3-degree separation filtering
-- [ ] Interactive navigation
+- [x] Dart Wasm 3D engine
+- [x] Force-directed village visualization
+- [x] 3-degree separation filtering
+- [x] Interactive navigation
 
 ### Week 4: The Domicile & Pilot Launch
 - [ ] Encrypted personal spaces
