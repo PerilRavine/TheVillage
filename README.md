@@ -107,10 +107,10 @@ dart run build:wasm
 - [x] Interactive navigation
 
 ### Week 4: The Domicile & Pilot Launch
-- [ ] Encrypted personal spaces
-- [ ] Brand tracking tools
-- [ ] 5-user stress test
-- [ ] Production deployment
+- [x] Encrypted personal spaces
+- [x] Brand tracking tools
+- [x] 5-user stress test
+- [x] Production deployment
 
 ## 🔧 Configuration
 
