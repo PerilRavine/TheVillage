@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: village_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: village_root_password
+      MYSQL_DATABASE: village
+      MYSQL_USER: village_user
+      MYSQL_PASSWORD: village_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - village_network
+
+  # Laravel Application (without Reverb for local testing)
+  village_app:
+    build:
+      context: ./village_engine
+      dockerfile: Dockerfile
+    container_name: village_app
+    restart: unless-stopped
+    environment:
+      APP_NAME: "The Village"
+      APP_ENV: local
+      APP_KEY: base64:village_encryption_key_32_chars_longer
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: village
+      DB_USERNAME: village_user
+      DB_PASSWORD: village_password
+      # Use database drivers for LAMP compatibility
+      CACHE_DRIVER: database
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: database
+      # Disable Reverb for local testing
+      REVERB_APP_ID: ""
+      REVERB_APP_KEY: ""
+      REVERB_APP_SECRET: ""
+      REVERB_HOST: ""
+      REVERB_PORT: ""
+      REVERB_SCHEME: ""
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+    volumes:
+      - ./village_engine:/var/www/html
+      - ./docker/storage:/var/www/html/storage
+    networks:
+      - village_network
+    
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  village_network:
+    driver: bridge

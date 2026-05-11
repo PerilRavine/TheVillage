@@ -15,6 +15,80 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Public routes
+Route::get('/villages', function () {
+    return response()->json([
+        ['id' => 'village1', 'name' => 'Tech Village', 'reputation' => 85.0],
+        ['id' => 'village2', 'name' => 'Art Village', 'reputation' => 72.5],
+        ['id' => 'village3', 'name' => 'Science Village', 'reputation' => 91.2],
+    ]);
+});
+
+Route::get('/user', function () {
+    return response()->json([
+        'user' => [
+            'id' => 'demo',
+            'username' => 'demo_user',
+            'display_name' => 'Demo User',
+            'email' => 'demo@village.local',
+            'role' => 'stranger',
+            'base_integrity' => 50.0,
+            'available_integrity' => 50.0,
+            'locked_integrity' => 0.0
+        ],
+        'permissions' => [
+            'can_view_domiciles' => true,
+            'can_create_domicile' => false,
+            'can_manage_users' => false
+        ]
+    ]);
+});
+
+// Authentication routes
+Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/logout', [AuthController::class, 'logout']);
+Route::post('/auth/switch-role', [AuthController::class, 'switchRole']);
+Route::get('/test-users', function () {
+    return response()->json([
+        'users' => [
+            [
+                'id' => 1,
+                'username' => 'stranger_user',
+                'display_name' => 'Stranger User',
+                'email' => 'stranger@village.local',
+                'role' => 'stranger',
+                'base_integrity' => 50.0
+            ],
+            [
+                'id' => 2,
+                'username' => 'sojourner_user',
+                'display_name' => 'Sojourner User',
+                'email' => 'sojourner@village.local',
+                'role' => 'sojourner',
+                'base_integrity' => 65.0
+            ],
+            [
+                'id' => 3,
+                'username' => 'denizen_user',
+                'display_name' => 'Denizen User',
+                'email' => 'denizen@village.local',
+                'role' => 'denizen',
+                'base_integrity' => 80.0
+            ]
+        ]
+    ]);
+});
+Route::post('/auth/login-as', [AuthController::class, 'loginAs']);
+
+// Admin routes
+Route::middleware('auth')->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard']);
+    Route::post('/server', [AdminController::class, 'storeServer']);
+    Route::post('/village', [AdminController::class, 'createVillage']);
+    Route::get('/stats/villages', [AdminController::class, 'getVillageStats']);
+    Route::get('/network/overview', [AdminController::class, 'getNetworkOverview']);
+});
+
 Route::middleware('auth')->group(function () {
     // P2P Discovery Routes
     Route::post('/p2p/discovery/request', [P2PController::class, 'requestPeerDiscovery']);

@@ -57,7 +57,9 @@ return new class extends Migration
             
             // Full-text search (SQLite doesn't support fullText)
             // $table->fullText(['name', 'description']);
-            $table->index(['name', 'description']);
+            // MySQL requires prefix length for TEXT columns in indexes
+            $table->index('name');
+            // Remove description index for MySQL compatibility
         });
     }
 

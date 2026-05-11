@@ -3,9 +3,10 @@ import 'package:vector_math/vector_math.dart';
 import 'scene_graph.dart';
 import 'force_directed_layout.dart';
 import 'three_degree_separation.dart';
+import 'village_renderer.dart';
 
-/// Main village map component
-/// Combines 3D rendering with force-directed layout and 3-degree separation
+/// Main village map application
+/// Integrates all 3D components for complete village visualization
 class VillageMap {
   final SceneGraph _sceneGraph;
   final ForceDirectedLayout _layout;

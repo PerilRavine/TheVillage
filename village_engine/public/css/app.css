@@ -1,0 +1,157 @@
+/* Tailwind CSS - Production Build */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for The Village */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+    background: #1a1a2e;
+}
+
+#village-canvas {
+    width: 100%;
+    height: 100vh;
+    display: block;
+}
+
+/* Loading screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* Control panel styles */
+.control-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    min-width: 200px;
+    z-index: 1000;
+}
+
+.control-panel h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.control-panel .status {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.control-panel .status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.control-panel .status-indicator.online {
+    background: #00ff00;
+}
+
+.control-panel .status-indicator.offline {
+    background: #ff0000;
+}
+
+.control-panel button {
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 2px;
+}
+
+.control-panel button:hover {
+    background: #555;
+}
+
+.control-panel button.active {
+    background: #007bff;
+}
+
+/* User role display */
+.user-role {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    z-index: 1000;
+}
+
+.user-role .role-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.user-role .role-permissions {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* Stats panel */
+.stats-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    z-index: 1000;
+}
+
+.stats-panel .stat {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.stats-panel .stat-value {
+    font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .control-panel {
+        top: 10px;
+        right: 10px;
+        padding: 10px;
+        min-width: 150px;
+    }
+    
+    .user-role {
+        top: 10px;
+        left: 10px;
+        padding: 10px;
+    }
+    
+    .stats-panel {
+        bottom: 10px;
+        right: 10px;
+        padding: 10px;
+    }
+}

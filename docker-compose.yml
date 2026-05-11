@@ -12,7 +12,7 @@ services:
       MYSQL_USER: village_user
       MYSQL_PASSWORD: village_password
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -66,11 +66,8 @@ services:
       REVERB_HOST: reverb
       REVERB_PORT: 8080
       REVERB_SCHEME: http
-      CACHE_DRIVER: redis
-      SESSION_DRIVER: redis
-      REDIS_HOST: redis
-      REDIS_PASSWORD: null
-      REDIS_PORT: 6379
+      CACHE_DRIVER: database
+      SESSION_DRIVER: database
       VILLAGE_ID: alpha
       VILLAGE_NAME: "Village Alpha"
       VILLAGE_SLUG: "village-alpha"
@@ -81,7 +78,6 @@ services:
     depends_on:
       - mysql
       - reverb
-      - redis
     volumes:
       - ./village_engine:/var/www/html
       - ./docker/alpha/storage:/var/www/html/storage
@@ -113,11 +109,8 @@ services:
       REVERB_HOST: reverb
       REVERB_PORT: 8080
       REVERB_SCHEME: http
-      CACHE_DRIVER: redis
-      SESSION_DRIVER: redis
-      REDIS_HOST: redis
-      REDIS_PASSWORD: null
-      REDIS_PORT: 6379
+      CACHE_DRIVER: database
+      SESSION_DRIVER: database
       VILLAGE_ID: beta
       VILLAGE_NAME: "Village Beta"
       VILLAGE_SLUG: "village-beta"
@@ -128,7 +121,6 @@ services:
     depends_on:
       - mysql
       - reverb
-      - redis
     volumes:
       - ./village_engine:/var/www/html
       - ./docker/beta/storage:/var/www/html/storage
@@ -160,11 +152,8 @@ services:
       REVERB_HOST: reverb
       REVERB_PORT: 8080
       REVERB_SCHEME: http
-      CACHE_DRIVER: redis
-      SESSION_DRIVER: redis
-      REDIS_HOST: redis
-      REDIS_PASSWORD: null
-      REDIS_PORT: 6379
+      CACHE_DRIVER: database
+      SESSION_DRIVER: database
       VILLAGE_ID: gamma
       VILLAGE_NAME: "Village Gamma"
       VILLAGE_SLUG: "village-gamma"
@@ -175,23 +164,9 @@ services:
     depends_on:
       - mysql
       - reverb
-      - redis
     volumes:
       - ./village_engine:/var/www/html
       - ./docker/gamma/storage:/var/www/html/storage
-    networks:
-      - village_network
-
-  # Database driver for Reverb (instead of Redis)
-  # Redis for caching and sessions
-  redis:
-    image: redis:7-alpine
-    container_name: village_redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
     networks:
       - village_network
 
@@ -215,8 +190,6 @@ services:
 
 volumes:
   mysql_data:
-    driver: local
-  redis_data:
     driver: local
 
 networks:

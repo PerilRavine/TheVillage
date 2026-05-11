@@ -2,20 +2,18 @@ import 'dart:math';
 import 'package:vector_math/vector_math.dart';
 import 'scene_graph.dart';
 
-/// Force-directed graph layout for village positioning
-/// Implements Hooke's law for springs and Coulomb's law for repulsion
+/// Force-directed graph layout algorithm for village positioning
+/// Uses Hooke's law for spring forces and Coulomb's law for repulsion
 class ForceDirectedLayout {
   final SceneGraph _sceneGraph;
   final Map<String, Vector3> _nodePositions = {};
   final Map<String, Vector3> _nodeVelocities = {};
-  final Map<String, double> _nodeMasses = {};
+  final double _springConstant = 0.1;
+  final double _repulsionConstant = 1000.0;
+  final double _damping = 0.95;
+  final double _centerPull = 0.01;
   
-  // Physics parameters
-  static const double _springConstant = 0.1;
-  static const double _repulsionConstant = 1000.0;
-  static const double _damping = 0.9;
-  static const double _idealDistance = 200.0;
-  static const double _minDistance = 50.0;
+  Vector3 _force = Vector3.zero();
   
   ForceDirectedLayout(this._sceneGraph) {
     _initializeNodePositions();
@@ -26,90 +24,53 @@ class ForceDirectedLayout {
   void update(double deltaTime) {
     _applyForces(deltaTime);
     _updatePositions(deltaTime);
-    _constrainToBounds();
   }
   
   /// Apply spring and repulsion forces
   void _applyForces(double deltaTime) {
-    final nodes = _sceneGraph.getAllNodes();
-    
-    for (final node in nodes) {
-      final force = Vector3.zero();
+    for (final node in _sceneGraph.nodes) {
+      _force = Vector3.zero();
       
-      // Apply spring forces from connected nodes
-      for (final edge in _sceneGraph.getAllEdges()) {
-        if (edge.node1.id == node.id || edge.node2.id == node.id) {
-          final otherNode = edge.node1.id == node.id ? edge.node2 : edge.node1;
-          final springForce = _calculateSpringForce(node, otherNode, edge);
-          force += springForce;
+      // Spring forces to connected nodes
+      for (final edge in _sceneGraph.edges) {
+        if (edge.source == node.id || edge.target == node.id) {
+          final otherNode = _sceneGraph.getNodeById(
+              edge.source == node.id ? edge.target : edge.source);
+          if (otherNode != null) {
+            final displacement = _nodePositions[otherNode!.id]! - _nodePositions[node.id]!;
+            final distance = displacement.length;
+            if (distance > 0.01) {
+              final springForce = displacement.normalized() * _springConstant * (distance - 100.0);
+              _force += springForce;
+            }
+          }
         }
       }
       
-      // Apply repulsion forces from all other nodes
-      for (final otherNode in nodes) {
+      // Repulsion forces from all other nodes
+      for (final otherNode in _sceneGraph.nodes) {
         if (otherNode.id != node.id) {
-          final repulsionForce = _calculateRepulsionForce(node, otherNode);
-          force += repulsionForce;
+          final displacement = _nodePositions[node.id]! - _nodePositions[otherNode.id]!;
+          final distance = displacement.length;
+          if (distance > 0.01 && distance < 200.0) {
+            final repulsionForce = displacement.normalized() * 
+                (_repulsionConstant / (distance * distance));
+            _force += repulsionForce;
+          }
         }
       }
       
-      // Apply center gravity to keep graph centered
-      final centerForce = _calculateCenterForce(node);
-      force += centerForce;
+      // Center pull force
+      final centerForce = -_nodePositions[node.id]! * _centerPull;
+      _force += centerForce;
       
-      // Update velocity with force and damping
-      final acceleration = force / _nodeMasses[node.id]!;
-      _nodeVelocities[node.id] = (_nodeVelocities[node.id]! + acceleration * deltaTime) * _damping;
+      // Apply damping
+      final velocity = _nodeVelocities[node.id]!;
+      final dampedForce = _force - velocity * _damping;
+      
+      // Update velocity
+      _nodeVelocities[node.id] = velocity + dampedForce * deltaTime;
     }
-  }
-  
-  /// Calculate spring force between two connected nodes
-  Vector3 _calculateSpringForce(SceneNode node1, SceneNode node2, SceneEdge edge) {
-    final displacement = node2.position - node1.position;
-    final distance = displacement.length;
-    
-    if (distance < _minDistance) {
-      return Vector3.zero();
-    }
-    
-    // Hooke's law: F = -k * x
-    final forceMagnitude = _springConstant * (distance - _idealDistance);
-    final forceDirection = displacement.normalized();
-    
-    return forceDirection * forceMagnitude * _getEdgeWeight(edge);
-  }
-  
-  /// Calculate repulsion force between two nodes
-  Vector3 _calculateRepulsionForce(SceneNode node1, SceneNode node2) {
-    final displacement = node2.position - node1.position;
-    final distance = displacement.length;
-    
-    if (distance < _minDistance) {
-      return Vector3.zero();
-    }
-    
-    // Coulomb's law: F = k * q1 * q2 / r^2
-    final forceMagnitude = _repulsionConstant / (distance * distance);
-    final forceDirection = displacement.normalized();
-    
-    return -forceDirection * forceMagnitude; // Repel, not attract
-  }
-  
-  /// Calculate center gravity force
-  Vector3 _calculateCenterForce(SceneNode node) {
-    final center = Vector3.zero();
-    final displacement = center - node.position;
-    final distance = displacement.length;
-    
-    if (distance < 1.0) {
-      return Vector3.zero();
-    }
-    
-    // Gentle pull toward center
-    final forceMagnitude = 0.01;
-    final forceDirection = displacement.normalized();
-    
-    return forceDirection * forceMagnitude;
   }
   
   /// Update node positions based on velocities

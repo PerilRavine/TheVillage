@@ -14,9 +14,15 @@ class Village extends Model
 
     protected $fillable = [
         'name',
-        'slug',
+        'type',
+        'size',
+        'reputation_required',
+        'server_id',
+        'admin_id',
+        'status',
+        'current_population',
+        'max_population',
         'description',
-        'theme',
         'settings',
         'reputation_score',
         'population',

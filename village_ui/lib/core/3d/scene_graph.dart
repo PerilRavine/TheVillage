@@ -8,6 +8,20 @@ class SceneGraph {
   final List<SceneNode> _nodes = [];
   final List<SceneEdge> _edges = [];
   
+  /// Visibility state for scene nodes
+  bool visible = true;
+  
+  // Material properties
+  String material = 'default';
+  
+  // Transform properties
+  Vector3 position = Vector3.zero();
+  Vector3 scale = Vector3.all(1.0);
+  double rotation = 0.0;
+  
+  // Mass for physics simulation
+  double mass = 1.0;
+  
   // Spatial partitioning for performance
   final SpatialGrid _spatialGrid = SpatialGrid(cellSize: 100.0);
   

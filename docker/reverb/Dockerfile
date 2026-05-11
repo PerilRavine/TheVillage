@@ -27,8 +27,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Install Laravel Reverb
-RUN composer create-project laravel/reverb . --no-install
+# Copy Laravel application
+COPY ../village_engine /var/www/html
+
+# Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
 # Create Reverb configuration

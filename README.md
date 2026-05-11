@@ -266,7 +266,7 @@ The frontend is built with Dart and compiled to webasm for maximum performance w
 - beatpoetmassive.com (an artist collective website)
 - allysonvollmer.com (A singlepage website for an RMT)
 
-1 Village with 5 denizens.
+3 Village with 5 denizens each.
 3 instances of successful p2p resource sharing
 
 ## How it works:

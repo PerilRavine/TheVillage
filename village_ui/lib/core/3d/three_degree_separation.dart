@@ -197,8 +197,8 @@ class ThreeDegreeSeparation {
       'total_edges': totalEdges,
       'average_connections': averageConnections,
       'reputation_range': {
-        'min': _reputationScores.values.isEmpty ? 0.0 : _reputationScores.values.reduce(min),
-        'max': _reputationScores.values.isEmpty ? 0.0 : _reputationScores.values.reduce(max),
+        'min': _reputationScores.values.isEmpty ? 0.0 : _reputationScores.values.reduce(math.min),
+        'max': _reputationScores.values.isEmpty ? 0.0 : _reputationScores.values.reduce(math.max),
         'average': _reputationScores.values.isEmpty ? 0.0 : _reputationScores.values.reduce(0, (sum, score) => sum + score) / _reputationScores.length,
       },
     };
