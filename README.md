@@ -252,11 +252,6 @@ I believe that social media is not just a reflection of society, but a tool that
 
 In my vision each individual has a reputation score based on their actions and contributions to the community. This score represents their trust and community standing. On a wider scope a entire village can have a reputation score based on their actions and contributions to other villages. and on a hardware level each server can have a reputation score based on their actions and contributions to the network.
 
-## Stack
-- Low cost LAMP hosting
-- Laravel (13)
-- Dart (3) compiled to webasm
-Built on low cost hosting, with built in p2p resource sharing, makes the server extreemly scalable. it also means the more servers the faster and more reliable the network becomes.
 The frontend is built with Dart and compiled to webasm for maximum performance while rendering a 3d UI. 
 
 ## 1 Month Goal
